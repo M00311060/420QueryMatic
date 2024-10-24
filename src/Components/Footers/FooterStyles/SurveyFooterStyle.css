@@ -1,0 +1,9 @@
+.SurveyFooter {
+    display: flex;         
+    justify-content: center; 
+    gap: 10px 100px;             
+  }
+  
+  .SurveyFooter button {
+    padding: 10px 20px;   
+  }

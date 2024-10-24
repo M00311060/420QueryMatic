@@ -1,0 +1,9 @@
+.PromptBuilderFooter {
+    display: flex;         
+    justify-content: center; 
+    gap: 10px 100px;             
+  }
+  
+  .PromptBuilderFooter button {
+    padding: 10px 20px;   
+  }

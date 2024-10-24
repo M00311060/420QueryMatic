@@ -1,0 +1,16 @@
+.SurveyHeader {
+    display: flex;                  
+    justify-content: space-between; 
+    align-items: center;            
+    padding: 10px;   
+               
+  }
+  
+  .SurveyHeader h1 {
+    margin: 0;  
+    padding: 40px                       
+  }
+  
+  .SurveyHeader button {
+    padding: 10px 20px;            
+  }
