@@ -13,20 +13,32 @@ const Survey = () => {
        
     };
 
+    const selectAll = () => {
+      navigate('/promptSelect');
+    }
+
+    const addEntry = () => {
+      navigate('/promptAdd');
+    }
+
+    const deleteEntry = () => {
+      navigate('/promptDelete');
+    }
+
+    const editEntry = () => {
+      navigate('/promptUpdate');
+    }    
+
 
     return (
       <div className ="container">
         <HeaderSurveyPage className = "header"/>
-        <h3>Sample Question 1</h3>
-        <h3>Sample Question 2</h3>
-        <h3>Sample Question 3</h3>
-        <h3>Sample Question 4</h3>
-        <h3>Sample Question 5</h3>
-        <h3>Sample Question 6</h3>
+        <p>I would like to see the data in the table.</p><button type = "SelectAll" onClick= {selectAll}>Select</button>
+        <p>I would like to add data to the table.</p><button type = "addEntry" onClick= {addEntry}>Select</button>
+        <p>I would like to delete from the table.</p><button type = "deleteEntry" onClick= {deleteEntry}>Select</button>
+        <p>I would like to edit data in the table.</p><button type = "editEntry" onClick= {editEntry}>Select</button>
         <FooterSurveyPage className = "footer"/>
-      </div>
-      
-      
+      </div>    
     );
   };
   
