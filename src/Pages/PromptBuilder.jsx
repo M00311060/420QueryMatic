@@ -12,10 +12,10 @@ const PromptBuilder = () => {
   const [showResults, setShowResults] = useState(false);
   const [sqlQuery, setSqlQuery] = useState('');
   const [newTeam, setNewTeam] = useState({ name: '', location: '', league: '', abbreviation: '', championships: 0 });
+  const [updateTeam, setUpdateTeam] = useState(null); // State for updating a team
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch the list of NFL teams
     axios.get('http://localhost:3001/api/nfl-teams')
       .then((response) => {
         setTeams(response.data.data);
@@ -29,17 +29,14 @@ const PromptBuilder = () => {
     const selectedTeamId = e.target.value;
     const selectedTeam = teams.find((team) => team.id === parseInt(selectedTeamId));
 
-    // Set the selected team's ID and name
     setSelectedTeamId(selectedTeamId);
     setSelectedTeamName(selectedTeam?.name || null);
-    
-    // Construct the SQL query
+    setUpdateTeam(selectedTeam || null); // Populate update form with selected team's data
     setSqlQuery(`SELECT * FROM nfl_teams WHERE id = ${selectedTeamId}`);
   };
 
   const handleProceed = () => {
     if (selectedTeamId && selectedTeamName) {
-      // Navigate to the results page and pass the team name and SQL query
       navigate('/results', { state: { selectedTeamId, selectedTeamName, sqlQuery } });
     }
   };
@@ -50,15 +47,12 @@ const PromptBuilder = () => {
 
   const handleDelete = () => {
     if (selectedTeamId) {
-      // Confirm deletion
       const confirmDelete = window.confirm(`Are you sure you want to delete team ${selectedTeamName}?`);
       if (confirmDelete) {
         axios.delete(`http://localhost:3001/api/nfl-teams/${selectedTeamId}`)
           .then(() => {
             alert('Team deleted successfully!');
-            // Update the team list
             setTeams(teams.filter((team) => team.id !== parseInt(selectedTeamId)));
-            // Clear the selection
             setSelectedTeamId(null);
             setSelectedTeamName(null);
             setSqlQuery('');
@@ -72,19 +66,16 @@ const PromptBuilder = () => {
   };
 
   const handleCreateTeam = () => {
-    // Validate team data
     if (!newTeam.name || !newTeam.location || !newTeam.league || !newTeam.abbreviation) {
       alert('Please fill in all fields.');
       return;
     }
 
-    // Send POST request to create a new team
     axios.post('http://localhost:3001/api/nfl-teams', newTeam)
       .then((response) => {
         alert('New team created successfully!');
-        const createdTeam = response.data; // Get the entire created team object
+        const createdTeam = response.data;
 
-        // Navigate to the results page and pass the new team's details
         navigate('/results', {
           state: {
             selectedTeamId: createdTeam.id,
@@ -93,7 +84,6 @@ const PromptBuilder = () => {
           }
         });
 
-        // Clear the new team form
         setNewTeam({ name: '', location: '', league: '', abbreviation: '', championships: 0 });
       })
       .catch((error) => {
@@ -108,6 +98,30 @@ const PromptBuilder = () => {
       ...prevState,
       [name]: value
     }));
+  };
+
+  const handleUpdateInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateTeam(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleUpdateTeam = () => {
+    if (updateTeam) {
+      axios.put(`http://localhost:3001/api/nfl-teams/${updateTeam.id}`, updateTeam)
+        .then(() => {
+          alert('Team updated successfully!');
+          setTeams(teams.map((team) => (team.id === updateTeam.id ? updateTeam : team)));
+          setSqlQuery(`UPDATE nfl_teams SET name = '${updateTeam.name}', location = '${updateTeam.location}', league = '${updateTeam.league}', abbreviation = '${updateTeam.abbreviation}', championships = ${updateTeam.championships} WHERE id = ${updateTeam.id}`);
+          setShowResults(true);
+        })
+        .catch((error) => {
+          console.error('Error updating team:', error);
+          alert('Failed to update team.');
+        });
+    }
   };
 
   return (
@@ -126,7 +140,6 @@ const PromptBuilder = () => {
       <button onClick={handleShowResults} disabled={!selectedTeamId}>Show Results</button>
       <button onClick={handleDelete} disabled={!selectedTeamId}>Delete Team</button>
 
-      {/* New Team Creation Form */}
       <h3>Create a New NFL Team</h3>
       <input type="text" name="name" placeholder="Team Name" value={newTeam.name} onChange={handleInputChange} />
       <input type="text" name="location" placeholder="Location" value={newTeam.location} onChange={handleInputChange} />
@@ -134,6 +147,18 @@ const PromptBuilder = () => {
       <input type="text" name="abbreviation" placeholder="Abbreviation" value={newTeam.abbreviation} onChange={handleInputChange} />
       <input type="number" name="championships" placeholder="Championships" value={newTeam.championships} onChange={handleInputChange} />
       <button onClick={handleCreateTeam}>Create Team</button>
+
+      {updateTeam && (
+        <div>
+          <h3>Update Selected Team</h3>
+          <input type="text" name="name" placeholder="Team Name" value={updateTeam.name} onChange={handleUpdateInputChange} />
+          <input type="text" name="location" placeholder="Location" value={updateTeam.location} onChange={handleUpdateInputChange} />
+          <input type="text" name="league" placeholder="League" value={updateTeam.league} onChange={handleUpdateInputChange} />
+          <input type="text" name="abbreviation" placeholder="Abbreviation" value={updateTeam.abbreviation} onChange={handleUpdateInputChange} />
+          <input type="number" name="championships" placeholder="Championships" value={updateTeam.championships} onChange={handleUpdateInputChange} />
+          <button onClick={handleUpdateTeam}>Update Team</button>
+        </div>
+      )}
 
       {showResults && (
         <div>
@@ -148,5 +173,3 @@ const PromptBuilder = () => {
 };
 
 export default PromptBuilder;
-
-
