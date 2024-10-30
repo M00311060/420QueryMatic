@@ -8,41 +8,29 @@ const Results = () => {
   const location = useLocation();
   const [teamData, setTeamData] = useState(null);
   
-  // Extract selectedTeamId and sqlQuery from location state
+  // Extract selectedTeamId, sqlQuery, and deletedTeamName from location state
   const selectedTeamId = location.state?.selectedTeamId;
   const sqlQuery = location.state?.sqlQuery;
+  const deletedTeamName = location.state?.deletedTeamName;
 
   useEffect(() => {
-    // Log the selectedTeamId to ensure it's passed correctly
-    console.log("Selected Team ID:", selectedTeamId);
-
-    // Fetch team details if selectedTeamId is provided
     if (selectedTeamId) {
+      // Fetch team details if selectedTeamId is provided
       axios.get(`http://localhost:3001/api/nfl-teams/${selectedTeamId}`)
         .then((response) => setTeamData(response.data.data))
         .catch((error) => console.error('Error fetching team details:', error));
     }
   }, [selectedTeamId]);
 
-  const handleDelete = () => {
-    if (selectedTeamId) {
-      axios.delete(`http://localhost:3001/api/nfl-teams/${selectedTeamId}`)
-        .then(() => {
-          alert('Team deleted successfully!');
-          setTeamData(null); // Clear the team data after deletion
-        })
-        .catch((error) => {
-          console.error('Error deleting team:', error);
-          alert('Failed to delete team.');
-        });
-    }
-  };
-
   return (
     <div>
       <HeaderResultsPage />
       <h3>Selected NFL Team</h3>
-      {teamData ? (
+      
+      {/* Check for deletedTeamName first to display the deletion message */}
+      {deletedTeamName ? (
+        <p>Team "{deletedTeamName}" has been deleted successfully.</p>
+      ) : teamData ? (
         <div>
           <p><strong>Team Name:</strong> {teamData.name}</p>
           <p><strong>Location:</strong> {teamData.location}</p>
@@ -54,6 +42,7 @@ const Results = () => {
       ) : (
         <p>No team selected or unable to fetch team details.</p>
       )}
+
       <FooterResultsPage />
     </div>
   );

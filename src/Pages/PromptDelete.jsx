@@ -48,11 +48,16 @@ const PromptDelete = () => {
       if (confirmDelete) {
         axios.delete(`http://localhost:3001/api/nfl-teams/${selectedTeamId}`)
           .then(() => {
-            alert('Team deleted successfully!');
+            alert(`Team ${selectedTeamName} deleted successfully!`);
+            const deletedTeamName = selectedTeamName;
+
             setTeams(teams.filter((team) => team.id !== parseInt(selectedTeamId)));
             setSelectedTeamId(null);
             setSelectedTeamName(null);
             setSqlQuery('');
+
+            // Navigate to the results page, passing the deleted team name
+            navigate('/results', { state: { deletedTeamName } });
           })
           .catch((error) => {
             console.error('Error deleting team:', error);
