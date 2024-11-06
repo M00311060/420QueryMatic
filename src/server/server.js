@@ -60,6 +60,18 @@ app.get('/api/nfl-teams/:id', (req, res) => {
     });
 });
 
+// READ: Get teams by league
+app.get('/api/nfl-teams/league/:league', (req, res) => {
+    const league = req.params.league;
+    db.all(`SELECT * FROM nfl_teams WHERE league = ?`, [league], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ data: rows });
+    });
+});
+
 // UPDATE: Update an NFL team by ID
 app.put('/api/nfl-teams/:id', (req, res) => {
     const { id } = req.params;

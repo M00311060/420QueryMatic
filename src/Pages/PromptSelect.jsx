@@ -9,8 +9,9 @@ const PromptSelect = () => {
   const [teams, setTeams] = useState([]);
   const [selectedTeamId, setSelectedTeamId] = useState(null);
   const [selectedTeamName, setSelectedTeamName] = useState(null);
-  const [showResults, setShowResults] = useState(false);
   const [sqlQuery, setSqlQuery] = useState('');
+  const [leagues, setLeagues] = useState(['AFC', 'NFC']);
+  const [selectedLeague, setSelectedLeague] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,10 +39,21 @@ const PromptSelect = () => {
     }
   };
 
-  const handleShowResults = () => {
-    setShowResults(true);
+  const handleShowAllTeams = () => {
+    const allTeamsQuery = 'SELECT * FROM nfl_teams';
+    navigate('/results', { state: { leagueTeamsData: teams, selectedLeague: 'All Leagues', sqlQuery: allTeamsQuery } });
   };
 
+  const handleShowLeagueTeams = () => {
+    axios.get(`http://localhost:3001/api/nfl-teams/league/${selectedLeague}`)
+      .then((response) => {
+        const leagueQuery = `SELECT * FROM nfl_teams WHERE league = '${selectedLeague}'`;
+        navigate('/results', { state: { leagueTeamsData: response.data.data, selectedLeague, sqlQuery: leagueQuery } });
+      })
+      .catch((error) => {
+        console.error('Error fetching teams by league:', error);
+      });
+  };
 
   return (
     <div className="container">
@@ -56,14 +68,17 @@ const PromptSelect = () => {
         ))}
       </select>
       <button onClick={handleProceed} disabled={!selectedTeamId}>Proceed to Results</button>
-      <button onClick={handleShowResults} disabled={!selectedTeamId}>Show Results</button>
-    
-      {showResults && (
-        <div>
-          <h4>SQL Command:</h4>
-          <code>{sqlQuery}</code>
-        </div>
-      )}
+      
+      <h3>Filter Teams by League</h3>
+      <select onChange={(e) => setSelectedLeague(e.target.value)} value={selectedLeague}>
+        <option value="">--Select a League--</option>
+        {leagues.map((league) => (
+          <option key={league} value={league}>{league}</option>
+        ))}
+      </select>
+      <button onClick={handleShowLeagueTeams} disabled={!selectedLeague}>Show League Teams</button>
+
+      <button onClick={handleShowAllTeams}>Show All Teams</button>
 
       <FooterPromptBuilderPage className="footer" />
     </div>
