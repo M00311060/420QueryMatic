@@ -70,9 +70,9 @@ const PromptDelete = () => {
   return (
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
-      <h3>Select an NFL Team ID</h3>
+      <h3>Select an ID</h3>
       <select onChange={handleSelectTeam} value={selectedTeamId}>
-        <option value="">--Select a Team ID--</option>
+        <option value="">--Select ID--</option>
         {teams.map((team) => (
           <option key={team.id} value={team.id}>
             {team.id}
@@ -80,8 +80,7 @@ const PromptDelete = () => {
         ))}
       </select>
       <button onClick={handleProceed} disabled={!selectedTeamId}>Proceed to Results</button>
-      <button onClick={handleShowResults} disabled={!selectedTeamId}>Show Results</button>
-      <button onClick={handleDelete} disabled={!selectedTeamId}>Delete Team</button>
+      <button onClick={handleDelete} disabled={!selectedTeamId}>Delete</button>
 
       {showResults && (
         <div>

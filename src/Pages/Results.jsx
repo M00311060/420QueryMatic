@@ -13,8 +13,7 @@ const Results = () => {
   const selectedTeamId = location.state?.selectedTeamId;
   const sqlQuery = location.state?.sqlQuery;
   const deletedTeamName = location.state?.deletedTeamName;
-  const leagueTeamsData = location.state?.leagueTeamsData;
-  const selectedLeague = location.state?.selectedLeague;
+  const FilterTeamsData = location.state?.FilterTeamsData;
 
   useEffect(() => {
     if (selectedTeamId) {
@@ -30,7 +29,7 @@ const Results = () => {
       <h3>Results</h3>
       
       {deletedTeamName ? (
-        <p>Team "{deletedTeamName}" has been deleted successfully.</p>
+        <p>Data "{deletedTeamName}" has been deleted successfully.</p>
       ) : teamData ? (
         <div>
           <p><strong>Team Name:</strong> {teamData.name}</p>
@@ -40,38 +39,44 @@ const Results = () => {
           <p><strong>Championships:</strong> {teamData.championships}</p>
           <p><strong>SQL Query:</strong> <code>{sqlQuery}</code></p>
         </div>
-      ) : leagueTeamsData ? (
+      ) : FilterTeamsData ? (
         <div>
-          <h4>All NFL Teams:</h4>
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>City</th>
-                <th>League</th>
-                <th>Abbreviation</th>
-                <th>Championships</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leagueTeamsData.map((team) => (
-                <tr key={team.id}>
-                  <td>{team.id}</td>
-                  <td>{team.name}</td>
-                  <td>{team.location}</td>
-                  <td>{team.league}</td>
-                  <td>{team.abbreviation}</td>
-                  <td>{team.championships}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <h4>Filtered Data:</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>League</th>
+                        <th>Abbreviation</th>
+                        <th>Championships</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {FilterTeamsData.length > 0 ? (
+                        FilterTeamsData.map((team) => (
+                            <tr key={team.id}>
+                                <td>{team.id}</td>
+                                <td>{team.name}</td>
+                                <td>{team.location}</td>
+                                <td>{team.league}</td>
+                                <td>{team.abbreviation}</td>
+                                <td>{team.championships}</td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="6">No teams found.</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
           <h4>SQL Command:</h4>
           <code>{sqlQuery}</code>
         </div>
       ) : (
-        <p>No team selected or unable to fetch team details.</p>
+        <p>No data selected or unable to fetch details.</p>
       )}
 
       <FooterResultsPage />

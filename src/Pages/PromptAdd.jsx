@@ -81,9 +81,9 @@ const PromptAdd = () => {
   return (
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
-      <h3>Select an NFL Team ID</h3>
+      <h3>Select an ID</h3>
       <select onChange={handleSelectTeam} value={selectedTeamId}>
-        <option value="">--Select a Team ID--</option>
+        <option value="">--Select ID--</option>
         {teams.map((team) => (
           <option key={team.id} value={team.id}>
             {team.id}
@@ -93,13 +93,13 @@ const PromptAdd = () => {
       <button onClick={handleProceed} disabled={!selectedTeamId}>Proceed to Results</button>
       <button onClick={handleShowResults} disabled={!selectedTeamId}>Show Results</button>
 
-      <h3>Create a New NFL Team</h3>
+      <h3>Create a New Item</h3>
       <input type="text" name="name" placeholder="Team Name" value={newTeam.name} onChange={handleInputChange} />
       <input type="text" name="location" placeholder="Location" value={newTeam.location} onChange={handleInputChange} />
       <input type="text" name="league" placeholder="League" value={newTeam.league} onChange={handleInputChange} />
       <input type="text" name="abbreviation" placeholder="Abbreviation" value={newTeam.abbreviation} onChange={handleInputChange} />
       <input type="number" name="championships" placeholder="Championships" value={newTeam.championships} onChange={handleInputChange} />
-      <button onClick={handleCreateTeam}>Create Team</button>
+      <button onClick={handleCreateTeam}>Create</button>
 
       {showResults && (
         <div>

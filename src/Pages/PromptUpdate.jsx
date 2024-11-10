@@ -71,9 +71,9 @@ const PromptUpdate = () => {
   return (
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
-      <h3>Select an NFL Team ID</h3>
+      <h3>Select an ID</h3>
       <select onChange={handleSelectTeam} value={selectedTeamId}>
-        <option value="">--Select a Team ID--</option>
+        <option value="">--Select ID--</option>
         {teams.map((team) => (
           <option key={team.id} value={team.id}>
             {team.id}
@@ -85,13 +85,13 @@ const PromptUpdate = () => {
 
       {updateTeam && (
         <div>
-          <h3>Update Selected Team</h3>
+          <h3>Update Selected ID</h3>
           <input type="text" name="name" placeholder="Team Name" value={updateTeam.name} onChange={handleUpdateInputChange} />
           <input type="text" name="location" placeholder="Location" value={updateTeam.location} onChange={handleUpdateInputChange} />
           <input type="text" name="league" placeholder="League" value={updateTeam.league} onChange={handleUpdateInputChange} />
           <input type="text" name="abbreviation" placeholder="Abbreviation" value={updateTeam.abbreviation} onChange={handleUpdateInputChange} />
           <input type="number" name="championships" placeholder="Championships" value={updateTeam.championships} onChange={handleUpdateInputChange} />
-          <button onClick={handleUpdateTeam}>Update Team</button>
+          <button onClick={handleUpdateTeam}>Update</button>
         </div>
       )}
 
