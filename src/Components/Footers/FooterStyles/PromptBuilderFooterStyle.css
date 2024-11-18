@@ -7,3 +7,50 @@
   .PromptBuilderFooter button {
     padding: 10px 20px;   
   }
+  
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f8f8; /* Light background */
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    padding: 15px 0;
+  }
+  
+  .footer-links {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    gap: 20px; /* Spacing between buttons */
+  }
+  
+  .footer-links li {
+    display: inline-block;
+  }
+  
+  .footer-btn {
+    background-color: #000; /* Button background */
+    color: #fff; /* Text color */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 25px; /* Rounded corners */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .footer-btn:hover {
+    background-color: grey;
+    transform: scale(1.1); /* Slightly grow on hover */
+  }
+  
+  .footer-btn:focus {
+    outline: none;
+  }

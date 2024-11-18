@@ -1,16 +1,66 @@
-.SurveyHeader {
-    display: flex;                  
-    justify-content: space-between; 
-    align-items: center;            
-    padding: 10px;   
-               
-  }
-  
-  .SurveyHeader h1 {
-    margin: 0;  
-    padding: 40px                       
-  }
-  
-  .SurveyHeader button {
-    padding: 10px 20px;            
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  background-color: whitesmoke; 
+  padding: 15px 30px;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 30px; 
+}
+
+.nav-list li {
+  display: inline-block;
+}
+
+.nav-list a,
+.rightNav a {
+  text-decoration: none;
+  color: #fff; 
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 25px; 
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: #000; 
+}
+
+.nav-list a:hover,
+.rightNav a:hover {
+  background-color: grey; 
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo img {
+  width: 180px; 
+  border-radius: 50px;
+}
+
+.nav-list li a {
+  display: inline-block; 
+}
+
+.nav-list a,
+.rightNav a {
+  color: #fff !important; 
+}

@@ -1,0 +1,55 @@
+.container {
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.help-content {
+  margin: 40px 0;
+}
+
+.help-section {
+  margin-bottom: 30px;
+}
+
+.help-section h2 {
+  color: #333;
+  font-size: 24px;
+}
+
+.help-section p,
+.help-section ul,
+.help-section dl {
+  font-size: 18px;
+  color: #555;
+}
+
+.help-section ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.help-section li {
+  margin-bottom: 10px;
+}
+
+.help-section dl {
+  padding-left: 20px;
+}
+
+.help-section dt {
+  font-weight: bold;
+}
+
+.help-section dd {
+  margin-bottom: 10px;
+}
+
+footer {
+  margin-top: 40px;
+  text-align: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+}
+

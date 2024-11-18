@@ -81,6 +81,11 @@ const PromptAdd = () => {
   return (
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
+
+      <div className ="title">
+            <h1>Add To Database</h1>
+      </div>
+
       <h3>Select an ID</h3>
       <select onChange={handleSelectTeam} value={selectedTeamId}>
         <option value="">--Select ID--</option>
