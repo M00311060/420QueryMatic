@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import QuerymaticLogo from '../../assets/QuerymaticLogo.jpeg';
 
 const HeaderResultsPage = () => {
     const navigate = useNavigate();
@@ -17,7 +18,9 @@ const HeaderResultsPage = () => {
 
     return (
       <div className = "SurveyHeader">
-        <h1> QueryMatic</h1>
+        <div className="logo">
+                <img src={QuerymaticLogo} alt="QueryMatic Logo" />
+        </div>
         <h1>Results Page</h1>
         <button type = "New Query" onClick= {newQuery}>New Query</button>
         <button type = "Sign Out" onClick = {handleSignOut}>Sign Out</button>

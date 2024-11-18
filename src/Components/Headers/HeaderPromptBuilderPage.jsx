@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import QuerymaticLogo from '../../assets/QuerymaticLogo.jpeg';
 
 const HeaderPromptBuilderPage = () => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ const HeaderPromptBuilderPage = () => {
       <nav className="navbar background">
           <ul className="nav-list">
               <div className="logo">
-                  <img src="../../../public/QueryMaticLogo.png" alt="QueryMatic Logo" />
+                <img src={QuerymaticLogo} alt="QueryMatic Logo" />
               </div>
               <li>
                   <a href="/help" onClick={goToHelp}>Help/Info</a>

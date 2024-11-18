@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HeaderStyles/SurveyHeaderStyle.css';
+import QuerymaticLogo from '../../assets/QuerymaticLogo.jpeg';
 
 const HeaderSurveyPage = () => {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ const HeaderSurveyPage = () => {
           <nav className="navbar background">
               <ul className="nav-list">
                   <div className="logo">
-                      <img src="../../../public/QueryMaticLogo.png" alt="QueryMatic Logo" />
+                    <img src={QuerymaticLogo} alt="QueryMatic Logo" />
                   </div>
                   <li>
                       <a href="/help" onClick={goToHelp}>Help/Info</a>

@@ -15,10 +15,12 @@ const FooterPromptBuilderPage = () => {
     }
 
     return (
-        <div className="PromptBuilderFooter">
-            <button type="button" className="footer-btn" onClick={navSurvey}>Survey</button>
-            <button type="button" className="footer-btn" onClick={navResults}>Results</button>
-        </div>
+        <footer className="footer">
+            <div className="PromptBuilderFooter">
+                <button type="button" className="footer-btn" onClick={navSurvey}>Survey</button>
+                <button type="button" className="footer-btn" onClick={navResults}>Results</button>
+            </div>
+        </footer>
     );
 };
 

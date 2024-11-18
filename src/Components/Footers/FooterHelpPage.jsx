@@ -15,10 +15,12 @@ const FooterHelpPage = () => {
     };
 
     return (
-        <div className="HelpFooter">
-            <button type="button" className="footer-btn" onClick={navPromptBuilder}>Prompt Builder</button>
-            <button type="button" className="footer-btn" onClick={navResults}>Results</button>
-        </div>
+        <footer className="footer">
+            <div className="HelpFooter">
+                <button type="button" className="footer-btn" onClick={navPromptBuilder}>Prompt Builder</button>
+                <button type="button" className="footer-btn" onClick={navResults}>Results</button>
+            </div>
+        </footer>
     );
 };
 
