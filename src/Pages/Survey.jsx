@@ -34,14 +34,23 @@ const Survey = () => {
       <div className ="container">
         <HeaderSurveyPage className = "header"/>
 
+        <br />
+
           <div className ="title">
             <h1>Survey Page</h1>
           </div>
-          
-        <p>I would like to see the data in the table.</p><button type = "SelectAll" onClick= {selectAll}>Select</button>
-        <p>I would like to add data to the table.</p><button type = "addEntry" onClick= {addEntry}>Select</button>
-        <p>I would like to delete from the table.</p><button type = "deleteEntry" onClick= {deleteEntry}>Select</button>
-        <p>I would like to edit data in the table.</p><button type = "editEntry" onClick= {editEntry}>Select</button>
+        
+        <br />
+        <button type = "SelectAll" onClick= {selectAll}>See Data</button>
+        <br />
+        <br />
+        <button type = "addEntry" onClick= {addEntry}>Add Data</button>
+        <br />
+        <br />
+        <button type = "deleteEntry" onClick= {deleteEntry}>Delete Data</button>
+        <br />
+        <br />
+        <button type = "editEntry" onClick= {editEntry}>Edit Data</button>
         <FooterSurveyPage className = "footer"/>
       </div>    
     );
