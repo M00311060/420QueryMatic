@@ -38,10 +38,6 @@ const PromptDelete = () => {
     }
   };
 
-  const handleShowResults = () => {
-    setShowResults(true);
-  };
-
   const handleDelete = () => {
     if (selectedTeamId) {
       const confirmDelete = window.confirm(`Are you sure you want to delete team ${selectedTeamName}?`);
