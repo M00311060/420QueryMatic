@@ -90,9 +90,6 @@ app.get('/api/:table/filter', ensureDbSelected, (req, res) => {
     const { table } = req.params;
     const { column, value } = req.query;
 
-    // Log the query parameters
-    console.log(`Filtering ${table} by column: ${column} with value: ${value}`);
-
     if (!column || !value) {
         return res.status(400).json({ error: 'Column and value are required for filtering' });
     }
@@ -104,7 +101,6 @@ app.get('/api/:table/filter', ensureDbSelected, (req, res) => {
             res.status(500).json({ error: err.message });
             return;
         }
-        console.log(`Query result: ${JSON.stringify(rows)}`);  // Log the result
         res.json({ data: rows });
     });
 });
@@ -177,7 +173,7 @@ app.put('/api/:table/:id', ensureDbSelected, (req, res) => {
 });
 
 // DELETE: Delete a record by ID from any table
-app.delete('/api/:table/:id', ensureDbSelected, (req, res) => {
+app.delete('/api/:table/delete/:id', ensureDbSelected, (req, res) => {
     const { table, id } = req.params;
 
     const query = `DELETE FROM ${table} WHERE id = ?`;
@@ -187,7 +183,8 @@ app.delete('/api/:table/:id', ensureDbSelected, (req, res) => {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json({ deletedRows: this.changes });
+        // Returning the ID of the deleted record for confirmation
+        res.json({ deletedRows: this.changes, deletedRecordId: id });
     });
 });
 

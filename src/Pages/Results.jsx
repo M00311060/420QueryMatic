@@ -13,7 +13,7 @@ const Results = () => {
   const selectedEntity = location.state?.selectedEntity;
   const selectedId = location.state?.selectedTeamId;
   const sqlQuery = location.state?.sqlQuery;
-  const deletedTeamName = location.state?.deletedTeamName;
+  const deletedItem = location.state?.deletedItem;
   const FilterData = location.state?.FilterData;
 
   // If filterData is provided, we update the filterData state
@@ -39,8 +39,8 @@ const Results = () => {
       <HeaderResultsPage />
       <h3>Results</h3>
 
-      {deletedTeamName ? (
-        <p>Data "{deletedTeamName}" has been deleted successfully.</p>
+      {deletedItem ? (
+        <p>Record "{deletedItem}" has been deleted successfully.</p> 
       ) : teamData ? (
         <div>
           <p><strong>Team Name:</strong> {teamData.name}</p>

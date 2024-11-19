@@ -6,91 +6,131 @@ import HeaderPromptBuilderPage from '../Components/Headers/HeaderPromptBuilderPa
 import './PagesStyle/PromptBuilder.css';
 
 const PromptDelete = () => {
-  const [teams, setTeams] = useState([]);
-  const [selectedTeamId, setSelectedTeamId] = useState(null);
-  const [selectedTeamName, setSelectedTeamName] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-  const [sqlQuery, setSqlQuery] = useState('');
+  const [databases, setDatabases] = useState([]);
+  const [selectedDatabase, setSelectedDatabase] = useState('');
+  const [tables, setTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState('');
+  const [columns, setColumns] = useState([]);
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [recordId, setRecordId] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/nfl-teams')
+    // Fetch the list of available databases
+    axios.get('http://localhost:3001/api/databases')
       .then((response) => {
-        setTeams(response.data.data);
+        setDatabases(response.data.databases);
       })
       .catch((error) => {
-        console.error('Error fetching NFL teams:', error);
+        console.error('Error fetching databases:', error);
       });
   }, []);
 
-  const handleSelectTeam = (e) => {
-    const selectedTeamId = e.target.value;
-    const selectedTeam = teams.find((team) => team.id === parseInt(selectedTeamId));
+  const handleDatabaseChange = (e) => {
+    const selectedDb = e.target.value;
+    setSelectedDatabase(selectedDb);
 
-    setSelectedTeamId(selectedTeamId);
-    setSelectedTeamName(selectedTeam?.name || null);
-    setSqlQuery(`SELECT * FROM nfl_teams WHERE id = ${selectedTeamId}`);
-  };
-
-  const handleProceed = () => {
-    if (selectedTeamId && selectedTeamName) {
-      navigate('/results', { state: { selectedTeamId, selectedTeamName, sqlQuery } });
-    }
-  };
-
-  const handleDelete = () => {
-    if (selectedTeamId) {
-      const confirmDelete = window.confirm(`Are you sure you want to delete team ${selectedTeamName}?`);
-      if (confirmDelete) {
-        axios.delete(`http://localhost:3001/api/nfl-teams/${selectedTeamId}`)
-          .then(() => {
-            alert(`Team ${selectedTeamName} deleted successfully!`);
-            const deletedTeamName = selectedTeamName;
-
-            setTeams(teams.filter((team) => team.id !== parseInt(selectedTeamId)));
-            setSelectedTeamId(null);
-            setSelectedTeamName(null);
-            setSqlQuery('');
-
-            // Navigate to the results page, passing the deleted team name
-            navigate('/results', { state: { deletedTeamName } });
+    axios.post('http://localhost:3001/api/select-database', { database: selectedDb })
+      .then(() => {
+        axios.get('http://localhost:3001/api/tables')
+          .then((response) => {
+            if (response.data.tables) {
+              setTables(response.data.tables);
+            }
           })
           .catch((error) => {
-            console.error('Error deleting team:', error);
-            alert('Failed to delete team.');
+            console.error('Error fetching tables:', error);
+            setTables([]);  // Clear the tables list if an error occurs
           });
-      }
-    }
+      })
+      .catch((error) => {
+        console.error('Error selecting database:', error);
+        setTables([]);  // Clear tables if the database selection fails
+      });
   };
 
+  const handleTableChange = (e) => {
+    const selectedTable = e.target.value;
+    setSelectedTable(selectedTable);
+
+    // Fetch columns of the selected table
+    axios.get(`http://localhost:3001/api/${selectedTable}/columns`)
+      .then((response) => {
+        setColumns(response.data.columns);
+      })
+      .catch((error) => {
+        console.error('Error fetching columns:', error);
+      });
+  };
+
+  const handleColumnChange = (e) => {
+    setSelectedColumn(e.target.value);
+  };
+  
+  const handleDelete = () => {
+    if (!recordId || !selectedTable) {
+      alert('Please select a table and enter a record ID.');
+      return;
+    }
+  
+    axios.delete(`http://localhost:3001/api/${selectedTable}/delete/${recordId}`)
+      .then((response) => {
+        setRecordId(''); // Clear the recorded ID
+  
+        // Navigate to Results page with the state
+        navigate('/results', {
+          state: {
+            selectedEntity: selectedDatabase,
+            sqlQuery: `SELECT * FROM ${selectedTable} WHERE id = ${recordId}`,
+            deletedItem: recordId, // Pass the team name
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error deleting record:', error);
+        alert('Failed to delete the record. Please try again.');
+      });
+  };
+  
   return (
-    <div className="container">
-      <HeaderPromptBuilderPage className="header" />
+    <div className="prompt-delete">
+      <HeaderPromptBuilderPage />
+      <div className="content">
+        <h1>Delete Record</h1>
 
-      <div className ="title">
-            <h1>Delete From Database</h1>
-      </div>
-
-      <h3>Select an ID</h3>
-      <select onChange={handleSelectTeam} value={selectedTeamId}>
-        <option value="">--Select ID--</option>
-        {teams.map((team) => (
-          <option key={team.id} value={team.id}>
-            {team.id}
-          </option>
-        ))}
-      </select>
-      <button onClick={handleProceed} disabled={!selectedTeamId}>Proceed to Results</button>
-      <button onClick={handleDelete} disabled={!selectedTeamId}>Delete</button>
-
-      {showResults && (
-        <div>
-          <h4>SQL Command:</h4>
-          <code>{sqlQuery}</code>
+        <div className="form-group">
+          <label>Select Database:</label>
+          <select value={selectedDatabase} onChange={handleDatabaseChange}>
+            <option value="">--Select Database--</option>
+            {databases.map((db) => (
+              <option key={db} value={db}>{db}</option>
+            ))}
+          </select>
         </div>
-      )}
 
-      <FooterPromptBuilderPage className="footer" />
+        <div className="form-group">
+          <label>Select Table:</label>
+          <select value={selectedTable} onChange={handleTableChange}>
+            <option value="">--Select Table--</option>
+            {tables.map((table) => (
+              <option key={table} value={table}>{table}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Record ID:</label>
+          <input
+            type="text"
+            value={recordId}
+            onChange={(e) => setRecordId(e.target.value)}
+            placeholder="Enter Record ID"
+          />
+        </div>
+
+        <button onClick={handleDelete}>Delete Record</button>
+      </div>
+      <FooterPromptBuilderPage />
     </div>
   );
 };
