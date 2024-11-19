@@ -6,114 +6,150 @@ import HeaderPromptBuilderPage from '../Components/Headers/HeaderPromptBuilderPa
 import './PagesStyle/PromptBuilder.css';
 
 const PromptAdd = () => {
-  const [teams, setTeams] = useState([]);
-  const [selectedTeamId, setSelectedTeamId] = useState(null);
-  const [selectedTeamName, setSelectedTeamName] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-  const [sqlQuery, setSqlQuery] = useState('');
-  const [newTeam, setNewTeam] = useState({ name: '', location: '', league: '', abbreviation: '', championships: 0 });
+  const [databases, setDatabases] = useState([]);
+  const [selectedDatabase, setSelectedDatabase] = useState('');
+  const [tables, setTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState('');
+  const [columns, setColumns] = useState([]);
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [filterValue, setFilterValue] = useState('');
+  const [recordId, setRecordId] = useState('');
+  const [recordData, setRecordData] = useState(null);
+  const [formData, setFormData] = useState({}); // For storing form input data
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/nfl-teams')
+    // Fetch the list of available databases
+    axios.get('http://localhost:3001/api/databases')
       .then((response) => {
-        setTeams(response.data.data);
+        setDatabases(response.data.databases);
       })
       .catch((error) => {
-        console.error('Error fetching NFL teams:', error);
+        console.error('Error fetching databases:', error);
       });
   }, []);
 
-  const handleSelectTeam = (e) => {
-    const selectedTeamId = e.target.value;
-    const selectedTeam = teams.find((team) => team.id === parseInt(selectedTeamId));
+  const handleDatabaseChange = (e) => {
+    const selectedDb = e.target.value;
+    setSelectedDatabase(selectedDb);
 
-    setSelectedTeamId(selectedTeamId);
-    setSelectedTeamName(selectedTeam?.name || null);
-    setSqlQuery(`SELECT * FROM nfl_teams WHERE id = ${selectedTeamId}`);
-  };
-
-  const handleProceed = () => {
-    if (selectedTeamId && selectedTeamName) {
-      navigate('/results', { state: { selectedTeamId, selectedTeamName, sqlQuery } });
-    }
-  };
-
-  const handleShowResults = () => {
-    setShowResults(true);
-  };
-
-  const handleCreateTeam = () => {
-    if (!newTeam.name || !newTeam.location || !newTeam.league || !newTeam.abbreviation) {
-      alert('Please fill in all fields.');
-      return;
-    }
-
-    axios.post('http://localhost:3001/api/nfl-teams', newTeam)
-      .then((response) => {
-        alert('New team created successfully!');
-        const createdTeam = response.data;
-
-        navigate('/results', {
-          state: {
-            selectedTeamId: createdTeam.id,
-            selectedTeamName: createdTeam.name,
-            sqlQuery: `INSERT INTO nfl_teams (name, location, league, abbreviation, championships) VALUES ('${createdTeam.name}', '${createdTeam.location}', '${createdTeam.league}', '${createdTeam.abbreviation}', ${createdTeam.championships})`
-          }
-        });
-
-        setNewTeam({ name: '', location: '', league: '', abbreviation: '', championships: 0 });
+    axios.post('http://localhost:3001/api/select-database', { database: selectedDb })
+      .then(() => {
+        axios.get('http://localhost:3001/api/tables')
+          .then((response) => {
+            if (response.data.tables) {
+              setTables(response.data.tables);
+            }
+          })
+          .catch((error) => {
+            console.error('Error fetching tables:', error);
+            setTables([]);  // Clear the tables list if an error occurs
+          });
       })
       .catch((error) => {
-        console.error('Error creating team:', error);
-        alert('Failed to create team.');
+        console.error('Error selecting database:', error);
+        setTables([]);  // Clear tables if the database selection fails
       });
   };
 
+  const handleTableChange = (e) => {
+    const selectedTable = e.target.value;
+    setSelectedTable(selectedTable);
+
+    // Fetch columns of the selected table
+    axios.get(`http://localhost:3001/api/${selectedTable}/columns`)
+      .then((response) => {
+        setColumns(response.data.columns);
+        // Initialize formData with empty values for each column
+        const initialData = response.data.columns.reduce((acc, column) => {
+          acc[column] = '';
+          return acc;
+        }, {});
+        setFormData(initialData);
+      })
+      .catch((error) => {
+        console.error('Error fetching columns:', error);
+      });
+  };
+
+  const handleColumnChange = (e) => {
+    setSelectedColumn(e.target.value);
+  };
+
+  // Handle form field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewTeam(prevState => ({
-      ...prevState,
+    setFormData(prevData => ({
+      ...prevData,
       [name]: value
     }));
   };
 
-  return (
-    <div className="container">
-      <HeaderPromptBuilderPage className="header" />
+  // Handle form submission to add a new record
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-      <div className ="title">
-            <h1>Add To Database</h1>
+    if (!selectedTable) {
+      alert('Please select a table.');
+      return;
+    }
+
+    // Send the POST request to add the new record
+    axios.post(`http://localhost:3001/api/${selectedTable}`, formData)
+      .then((response) => {
+        alert(`Record added successfully! ID: ${response.data.id}`);
+        setRecordId(response.data.id);
+        // Optionally, navigate to another page or reset the form
+        navigate('/somePage');  // Adjust the path based on your needs
+      })
+      .catch((error) => {
+        console.error('Error adding record:', error);
+        alert('Failed to add record.');
+      });
+  };
+
+  return (
+    <div className="prompt-add-page">
+      <HeaderPromptBuilderPage />
+      
+      <div className="form-container">
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="database">Select Database:</label>
+          <select id="database" value={selectedDatabase} onChange={handleDatabaseChange}>
+            <option value="">--Select Database--</option>
+            {databases.map((database) => (
+              <option key={database} value={database}>{database}</option>
+            ))}
+          </select>
+
+          <label htmlFor="table">Select Table:</label>
+          <select id="table" value={selectedTable} onChange={handleTableChange}>
+            <option value="">--Select Table--</option>
+            {tables.map((table) => (
+              <option key={table} value={table}>{table}</option>
+            ))}
+          </select>
+
+          <div className="form-fields">
+            {columns.map((column) => (
+              <div key={column}>
+                <label htmlFor={column}>{column}:</label>
+                <input
+                  type="text"
+                  id={column}
+                  name={column}
+                  value={formData[column] || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
+            ))}
+          </div>
+
+          <button type="submit">Add Record</button>
+        </form>
       </div>
 
-      <h3>Select an ID</h3>
-      <select onChange={handleSelectTeam} value={selectedTeamId}>
-        <option value="">--Select ID--</option>
-        {teams.map((team) => (
-          <option key={team.id} value={team.id}>
-            {team.id}
-          </option>
-        ))}
-      </select>
-      <button onClick={handleProceed} disabled={!selectedTeamId}>Proceed to Results</button>
-      <button onClick={handleShowResults} disabled={!selectedTeamId}>Show Results</button>
-
-      <h3>Create a New Item</h3>
-      <input type="text" name="name" placeholder="Team Name" value={newTeam.name} onChange={handleInputChange} />
-      <input type="text" name="location" placeholder="Location" value={newTeam.location} onChange={handleInputChange} />
-      <input type="text" name="league" placeholder="League" value={newTeam.league} onChange={handleInputChange} />
-      <input type="text" name="abbreviation" placeholder="Abbreviation" value={newTeam.abbreviation} onChange={handleInputChange} />
-      <input type="number" name="championships" placeholder="Championships" value={newTeam.championships} onChange={handleInputChange} />
-      <button onClick={handleCreateTeam}>Create</button>
-
-      {showResults && (
-        <div>
-          <h4>SQL Command:</h4>
-          <code>{sqlQuery}</code>
-        </div>
-      )}
-
-      <FooterPromptBuilderPage className="footer" />
+      <FooterPromptBuilderPage />
     </div>
   );
 };
