@@ -6,6 +6,7 @@ import HeaderPromptBuilderPage from '../Components/Headers/HeaderPromptBuilderPa
 import './PagesStyle/PromptBuilder.css';
 
 const PromptDelete = () => {
+  // State variables to store databases, tables, columns, and user inputs
   const [databases, setDatabases] = useState([]);
   const [selectedDatabase, setSelectedDatabase] = useState('');
   const [tables, setTables] = useState([]);
@@ -15,8 +16,8 @@ const PromptDelete = () => {
   const [recordId, setRecordId] = useState('');
   const navigate = useNavigate();
 
+  // Fetch the list of available databases
   useEffect(() => {
-    // Fetch the list of available databases
     axios.get('http://localhost:3001/api/databases')
       .then((response) => {
         setDatabases(response.data.databases);
@@ -26,10 +27,12 @@ const PromptDelete = () => {
       });
   }, []);
 
+  // Handle database selection and fetch associated tables
   const handleDatabaseChange = (e) => {
     const selectedDb = e.target.value;
     setSelectedDatabase(selectedDb);
 
+    // Post selected database and fetch tables
     axios.post('http://localhost:3001/api/select-database', { database: selectedDb })
       .then(() => {
         axios.get('http://localhost:3001/api/tables')
@@ -49,6 +52,7 @@ const PromptDelete = () => {
       });
   };
 
+  // Handle table selection and fetch associated columns
   const handleTableChange = (e) => {
     const selectedTable = e.target.value;
     setSelectedTable(selectedTable);
@@ -63,16 +67,19 @@ const PromptDelete = () => {
       });
   };
 
+  // Updates the state with the selected column when a column is chosen from the dropdown
   const handleColumnChange = (e) => {
     setSelectedColumn(e.target.value);
   };
+  
   
   const handleDelete = () => {
     if (!recordId || !selectedTable) {
       alert('Please select a table and enter a record ID.');
       return;
     }
-  
+    
+    // Make an API call to delete the record from the selected table using the provided record ID
     axios.delete(`http://localhost:3001/api/${selectedTable}/delete/${recordId}`)
       .then((response) => {
         setRecordId(''); // Clear the recorded ID
@@ -98,6 +105,7 @@ const PromptDelete = () => {
       <div className="content">
         <h1>Delete Record</h1>
 
+        {/* Database dropdown */}
         <div className="form-group">
           <label>Select Database:</label>
           <select value={selectedDatabase} onChange={handleDatabaseChange}>
@@ -108,6 +116,7 @@ const PromptDelete = () => {
           </select>
         </div>
 
+        {/* Table dropdown */}
         <div className="form-group">
           <label>Select Table:</label>
           <select value={selectedTable} onChange={handleTableChange}>
@@ -118,6 +127,7 @@ const PromptDelete = () => {
           </select>
         </div>
 
+        {/* Input field for record ID */}
         <div className="form-group">
           <label>Record ID:</label>
           <input
@@ -128,6 +138,7 @@ const PromptDelete = () => {
           />
         </div>
 
+        {/* Delete button */}
         <button onClick={handleDelete}>Delete Record</button>
       </div>
       <FooterPromptBuilderPage />

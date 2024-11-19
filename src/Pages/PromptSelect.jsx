@@ -6,6 +6,7 @@ import HeaderPromptBuilderPage from '../Components/Headers/HeaderPromptBuilderPa
 import './PagesStyle/PromptBuilder.css';
 
 const PromptSelect = () => {
+  // State variables to store databases, tables, columns, and user inputs
   const [databases, setDatabases] = useState([]);
   const [selectedDatabase, setSelectedDatabase] = useState('');
   const [tables, setTables] = useState([]);
@@ -17,8 +18,8 @@ const PromptSelect = () => {
   const [recordData, setRecordData] = useState(null);
   const navigate = useNavigate();
 
+  // Fetch the list of available databases
   useEffect(() => {
-    // Fetch the list of available databases
     axios.get('http://localhost:3001/api/databases')
       .then((response) => {
         setDatabases(response.data.databases);
@@ -28,10 +29,12 @@ const PromptSelect = () => {
       });
   }, []);
 
+  // Handle database selection and fetch associated tables
   const handleDatabaseChange = (e) => {
     const selectedDb = e.target.value;
     setSelectedDatabase(selectedDb);
 
+    // Post selected database and fetch tables
     axios.post('http://localhost:3001/api/select-database', { database: selectedDb })
       .then(() => {
         axios.get('http://localhost:3001/api/tables')
@@ -51,6 +54,7 @@ const PromptSelect = () => {
       });
   };
 
+  // Handle table selection and fetch associated columns
   const handleTableChange = (e) => {
     const selectedTable = e.target.value;
     setSelectedTable(selectedTable);
@@ -65,14 +69,17 @@ const PromptSelect = () => {
       });
   };
 
+  // Updates the state with the selected column when a column is chosen from the dropdown
   const handleColumnChange = (e) => {
     setSelectedColumn(e.target.value);
   };
 
+  // Updates the state with the filter value when the user types in the filter input field
   const handleFilterChange = (e) => {
     setFilterValue(e.target.value);
   };
 
+  // Updates the state with the record ID when the user types in the record ID input field
   const handleRecordIdChange = (e) => {
     setRecordId(e.target.value);
   };
@@ -117,7 +124,7 @@ const PromptSelect = () => {
         navigate('/results', {
           state: {
             selectedEntity: selectedDatabase,
-            selectedTeamId: recordId,  // Keep the selectedTeamId in case it's needed
+            selectedTeamId: recordId,  
             sqlQuery: `SELECT * FROM ${selectedTable} WHERE ${selectedColumn} = ${filterValue}`,
             FilterData: response.data.data || [],
             deletedTeamName: ""
@@ -138,6 +145,7 @@ const PromptSelect = () => {
         <h1>Select From Database</h1>
       </div>
 
+      {/* Dropdown for selecting DB */}
       <h3>Select Database</h3>
       <select onChange={handleDatabaseChange} value={selectedDatabase}>
         <option value="">--Select Database--</option>
@@ -146,6 +154,7 @@ const PromptSelect = () => {
         ))}
       </select>
 
+      {/* Dropdown for selecting table */}
       <h3>Select Table</h3>
       <select onChange={handleTableChange} value={selectedTable} disabled={!selectedDatabase}>
         <option value="">--Select Table--</option>
@@ -154,6 +163,7 @@ const PromptSelect = () => {
         ))}
       </select>
 
+      {/* Dropdown for selecting column */}
       <h3>Select Column</h3>
       <select
         onChange={handleColumnChange}
@@ -168,6 +178,7 @@ const PromptSelect = () => {
         ))}
       </select>
 
+      {/* Input field to enter filter value */}
       <h3>Enter Filter Value</h3>
       <input
         type="text"
@@ -176,11 +187,13 @@ const PromptSelect = () => {
         placeholder="Enter filter value"
         disabled={!selectedColumn}
       />
-      
+
+      {/* Filter button */}
       <button onClick={handleFilter} disabled={!selectedColumn || !filterValue || !selectedTable}>
         Fetch by Filter
       </button>
 
+      {/* Input field to enter record ID */}
       <h3>Enter Record ID</h3>
       <input
         type="number"
@@ -190,10 +203,12 @@ const PromptSelect = () => {
         disabled={!selectedTable}
       />
 
+      {/* ID button */}
       <button onClick={handleFetchById} disabled={!recordId || !selectedTable}>
         Fetch by ID
       </button>
 
+      {/* Display data as json */}
       {recordData && (
         <div className="record-data">
           <h3>Record Details</h3>
