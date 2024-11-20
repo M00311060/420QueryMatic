@@ -125,6 +125,28 @@ const PromptSelect = () => {
     }
   };
 
+  // Fetch all records from the selected table
+  const handleFetchAllRecords = () => {
+    if (selectedTable) {
+      axios.get(`http://localhost:3001/api/${selectedTable}`)
+        .then((response) => {
+          // Navigate to Results page with all records
+          navigate('/results', {
+            state: {
+              selectedEntity: selectedDatabase,
+              sqlQuery: `SELECT * FROM ${selectedTable}`,
+              FilterData: response.data.data || []
+            }
+          });
+        })
+        .catch((error) => {
+          console.error('Error fetching all records:', error);
+        });
+    } else {
+      alert('Please select a table first.');
+    }
+  };
+
   return (
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
@@ -183,6 +205,10 @@ const PromptSelect = () => {
         Fetch by Filter
       </button>
 
+       {/* Button to fetch all records */}
+       <button onClick={handleFetchAllRecords} disabled={!selectedTable}>
+        Fetch All Records
+      </button>
 
       {/* Display data as json */}
       {recordData && (
