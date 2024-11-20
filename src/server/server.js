@@ -121,6 +121,30 @@ app.get('/api/:table/filter', ensureDbSelected, (req, res) => {
     });
 });
 
+// Endpoint to fetch table IDs from the selected database
+app.get('/api/:table/ids', ensureDbSelected, (req, res) => {
+    const { table } = req.params;
+
+    // Check if table exists
+    db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`, [table], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: `Table '${table}' does not exist.` });
+        }
+
+        // Fetch the IDs from the selected table
+        db.all(`SELECT id FROM ${table}`, (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            // Send the IDs as an array of objects
+            res.json({ ids: rows.map(row => row.id) });
+        });
+    });
+});
+
 // CREATE: Add a new record to any table
 app.post('/api/:table', ensureDbSelected, (req, res) => {
     const { table } = req.params;

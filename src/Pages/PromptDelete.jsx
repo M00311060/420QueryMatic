@@ -14,6 +14,7 @@ const PromptDelete = () => {
   const [columns, setColumns] = useState([]);
   const [selectedColumn, setSelectedColumn] = useState('');
   const [recordId, setRecordId] = useState('');
+  const [allIds, setAllIds] = useState([]);
   const navigate = useNavigate();
 
   // Fetch the list of available databases
@@ -65,6 +66,15 @@ const PromptDelete = () => {
       .catch((error) => {
         console.error('Error fetching columns:', error);
       });
+
+      // Fetch available record IDs from the selected table
+    axios.get(`http://localhost:3001/api/${selectedTable}/distinct-values?column=id`)
+    .then((response) => {
+      setAllIds(response.data.values);
+    })
+    .catch((error) => {
+      console.error('Error fetching record IDs:', error);
+    });
   };
 
   // Updates the state with the selected column when a column is chosen from the dropdown
@@ -127,15 +137,15 @@ const PromptDelete = () => {
           </select>
         </div>
 
-        {/* Input field for record ID */}
+        {/* Record ID dropdown */}
         <div className="form-group">
-          <label>Record ID:</label>
-          <input
-            type="text"
-            value={recordId}
-            onChange={(e) => setRecordId(e.target.value)}
-            placeholder="Enter Record ID"
-          />
+          <label>Select Record ID to Delete:</label>
+          <select value={recordId} onChange={(e) => setRecordId(e.target.value)}>
+            <option value="">--Select Record ID--</option>
+            {allIds.map((id) => (
+              <option key={id} value={id}>{id}</option>
+            ))}
+          </select>
         </div>
 
         {/* Delete button */}
