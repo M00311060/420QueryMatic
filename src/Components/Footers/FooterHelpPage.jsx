@@ -6,10 +6,6 @@ import './FooterStyles/HelpFooterStyle.css';
 const FooterHelpPage = () => {
     const navigate = useNavigate();
 
-    const navPromptBuilder = () => {
-        navigate('/promptbuilder');
-    };
-
     const navResults = () => {
         navigate('/results');
     };
@@ -17,7 +13,6 @@ const FooterHelpPage = () => {
     return (
         <footer className="footer">
             <div className="HelpFooter">
-                <button type="button" className="footer-btn" onClick={navPromptBuilder}>Prompt Builder</button>
                 <button type="button" className="footer-btn" onClick={navResults}>Results</button>
             </div>
         </footer>

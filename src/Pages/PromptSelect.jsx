@@ -71,10 +71,12 @@ const PromptSelect = () => {
   return (
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
+      <br />
 
       <div className ="title">
             <h1>Select From Database</h1>
       </div>
+      <br />
 
       <h3>Select an ID</h3>
       <select onChange={handleSelectTeam} value={selectedTeamId}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import HeaderSurveyPage from '../Components/Headers/HeaderHelpPage';
 import FooterSurveyPage from '../Components/Footers/FooterHelpPage';
-import './PagesStyle/HelpStyle.css';
+import './PagesStyle/HelpStyle.css'; 
 
 const Help = () => {
   return (
@@ -9,6 +9,7 @@ const Help = () => {
       <HeaderSurveyPage className="header" />
       <div className="help-content">
         <h1>Welcome to the Help/Info Page</h1>
+        <br />
         
         <section className="help-section">
           <h2>What is QueryMatic?</h2>

@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import FooterResultsPage from '../Components/Footers/FooterResultsPage';
 import HeaderResultsPage from '../Components/Headers/HeaderResultsPage';
+import './PagesStyle/ResultsStyle.css';
 
 const Results = () => {
   const location = useLocation();
@@ -24,9 +25,13 @@ const Results = () => {
   }, [selectedTeamId]);
 
   return (
-    <div>
+    <div className ="container">
       <HeaderResultsPage />
-      <h3>Results</h3>
+      <br />
+      <h1>Results Page</h1>
+      <br />
+      <h3>Your Query Results:</h3>
+      <hr />
       
       {deletedTeamName ? (
         <p>Data "{deletedTeamName}" has been deleted successfully.</p>

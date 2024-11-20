@@ -1,0 +1,7 @@
+.container {
+    padding: 20px;                  
+    background-image: url('../../assets/Cloudbackground.jpeg');
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center; 
+  }

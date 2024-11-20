@@ -5,23 +5,50 @@ import { useNavigate } from 'react-router-dom';
 const FooterResultsPage = () => {
     const navigate = useNavigate();
 
-    const navSurvey = () => {
-            navigate('/survey');
-       
-    };
+    const navPromptSelect = () => {
+        navigate('/promptselect');
+    }
 
-    const navPromptBuilder = () => {
-        navigate('/promptbuilder');
+    const navPromptAdd = () => {
+        navigate('/promptadd');
+    }
+
+    const navPromptDelete = () => {
+        navigate('/promptdelete');
+    }
+
+    const navPromptEdit = () => {
+        navigate('/promptUpdate');
     }
 
 
     return (
-      <div className = "SurveyFooter">
-        <button type = "Survey" onClick= {navSurvey}>Survey</button>
-        <button type = "Prompt Builder" onClick = {navPromptBuilder}>PromptBuilder</button>
-      </div>
+      <footer className="footer">
+          <ul className="footer-links">
+              <li>
+                  <button className="footer-btn" onClick={navPromptSelect}>
+                    Prompt Select
+                  </button>
+              </li>
+              <li>
+                  <button className="footer-btn" onClick={navPromptAdd}>
+                    Prompt Add
+                  </button>
+              </li>
+              <li>
+                  <button className="footer-btn" onClick={navPromptDelete}>
+                    Prompt Delete
+                  </button>
+              </li>
+              <li>
+                  <button className="footer-btn" onClick={navPromptEdit}>
+                    Prompt Edit
+                  </button>
+              </li>
+          </ul>
+      </footer>
       
     );
   };
-  
+
   export default FooterResultsPage;

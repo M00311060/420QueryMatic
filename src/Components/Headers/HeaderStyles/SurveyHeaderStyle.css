@@ -8,12 +8,15 @@
   display: flex;
   justify-content: space-between; 
   align-items: center;
-  background-color: #000; 
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   padding: 15px 30px;
   position: sticky;
   top: 0;
   width: 100%;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
 }
 
 .nav-list {

@@ -6,10 +6,6 @@ import './FooterStyles/SurveyFooterStyle.css';
   const FooterSurveyPage = () => {
       const navigate = useNavigate();
   
-      const navPromptBuilder = () => {
-          navigate('/promptbuilder');
-      };
-  
       const navResults = () => {
           navigate('/results');
       };
@@ -17,11 +13,6 @@ import './FooterStyles/SurveyFooterStyle.css';
       return (
           <footer className="footer">
               <ul className="footer-links">
-                  <li>
-                      <button className="footer-btn" onClick={navPromptBuilder}>
-                          Prompt Builder
-                      </button>
-                  </li>
                   <li>
                       <button className="footer-btn" onClick={navResults}>
                           Results

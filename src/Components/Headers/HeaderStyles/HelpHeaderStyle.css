@@ -27,7 +27,11 @@
     position: sticky;
     top: 0;
     cursor: pointer;
-    background: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     background-blend-mode: darken;
     background-size: cover;
   }
