@@ -23,17 +23,6 @@ const Results = () => {
     }
   }, [FilterData]);
 
-  // Fetch data based on selected entity and ID if available
-  useEffect(() => {
-    if (selectedEntity && selectedId) {
-      axios.get(`http://localhost:3001/api/${selectedEntity}/${selectedId}`)
-        .then((response) => {
-          setTeamData(response.data); // Update the state with fetched data
-        })
-        .catch((error) => console.error('Error fetching data:', error));
-    }
-  }, [selectedEntity, selectedId]);
-
   return (
     <div>
       <HeaderResultsPage />

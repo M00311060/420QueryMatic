@@ -61,7 +61,7 @@ const ensureDbSelected = (req, res, next) => {
     next();
 };
 
-// Endpoint to fetch all tables in the selected database
+// Endpoint: to fetch all tables in the selected database
 app.get('/api/tables', ensureDbSelected, (req, res) => {
     db.all("SELECT name FROM sqlite_master WHERE type='table'", (err, rows) => {
         if (err) {
@@ -71,7 +71,7 @@ app.get('/api/tables', ensureDbSelected, (req, res) => {
     });
 });
 
-// Endpoint to fetch columns of a table
+// Endpoint: to fetch columns of a table
 app.get('/api/:table/columns', ensureDbSelected, (req, res) => {
     const { table } = req.params;
 
@@ -85,6 +85,22 @@ app.get('/api/:table/columns', ensureDbSelected, (req, res) => {
         res.json({ columns });
     });
 });
+
+// Endpoint: to fetch distinct values from a specified column in a table
+app.get('/api/:table/distinct-values', (req, res) => {
+    const { table } = req.params;
+    const { column } = req.query;
+  
+    const query = `SELECT DISTINCT ${column} FROM ${table}`;
+    db.all(query, [], (err, rows) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send({ error: 'Failed to fetch distinct values' });
+      } else {
+        res.send({ values: rows.map((row) => row[column]) });
+      }
+    });
+  });  
 
 app.get('/api/:table/filter', ensureDbSelected, (req, res) => {
     const { table } = req.params;

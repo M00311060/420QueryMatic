@@ -13,6 +13,7 @@ const PromptSelect = () => {
   const [selectedTable, setSelectedTable] = useState('');
   const [columns, setColumns] = useState([]);
   const [selectedColumn, setSelectedColumn] = useState('');
+  const [columnValues, setColumnValues] = useState([]);
   const [filterValue, setFilterValue] = useState('');
   const [recordId, setRecordId] = useState('');
   const [recordData, setRecordData] = useState(null);
@@ -71,7 +72,18 @@ const PromptSelect = () => {
 
   // Updates the state with the selected column when a column is chosen from the dropdown
   const handleColumnChange = (e) => {
-    setSelectedColumn(e.target.value);
+    const selectedCol = e.target.value;
+    setSelectedColumn(selectedCol);
+    setColumnValues([]);
+
+    if (selectedCol) {
+      // Fetch distinct values for the selected column
+      axios.get(`http://localhost:3001/api/${selectedTable}/distinct-values`, {
+        params: { column: selectedCol },
+      })
+        .then((response) => setColumnValues(response.data.values || []))
+        .catch((error) => console.error('Error fetching distinct column values:', error));
+    }
   };
 
   // Updates the state with the filter value when the user types in the filter input field
@@ -82,30 +94,6 @@ const PromptSelect = () => {
   // Updates the state with the record ID when the user types in the record ID input field
   const handleRecordIdChange = (e) => {
     setRecordId(e.target.value);
-  };
-
-  const handleFetchById = () => {
-    if (recordId && selectedTable) {
-      // Fetch the record by ID
-      axios.get(`http://localhost:3001/api/${selectedTable}/${recordId}`)
-        .then((response) => {
-          setRecordData(response.data.data);
-
-          // Navigate to Results page with the state
-          navigate('/results', {
-            state: {
-              selectedEntity: selectedDatabase,
-              selectedTeamId: recordId,
-              sqlQuery: `SELECT * FROM ${selectedTable} WHERE id = ${recordId}`,
-              FilterData: response.data.data || [],
-              deletedTeamName: ""
-            }
-          });
-        })
-        .catch((error) => {
-          console.error('Error fetching record by ID:', error);
-        });
-    }
   };
 
   const handleFilter = () => {
@@ -124,10 +112,10 @@ const PromptSelect = () => {
         navigate('/results', {
           state: {
             selectedEntity: selectedDatabase,
-            selectedTeamId: recordId,  
+            selectedTeamId: '',  
             sqlQuery: `SELECT * FROM ${selectedTable} WHERE ${selectedColumn} = ${filterValue}`,
             FilterData: response.data.data || [],
-            deletedTeamName: ""
+            deletedTeamName: ''
           }
         });
       })
@@ -178,35 +166,23 @@ const PromptSelect = () => {
         ))}
       </select>
 
-      {/* Input field to enter filter value */}
-      <h3>Enter Filter Value</h3>
-      <input
-        type="text"
-        value={filterValue}
+      {/* Dropdown for filitering */}
+      <h3>Select Filter Value</h3>
+      <select
         onChange={handleFilterChange}
-        placeholder="Enter filter value"
-        disabled={!selectedColumn}
-      />
+        value={filterValue}
+        disabled={!columnValues.length}
+      >
+        <option value="">--Select Value--</option>
+        {columnValues.map((value, index) => (
+          <option key={index} value={value}>{value}</option>
+        ))}
+      </select>
 
-      {/* Filter button */}
       <button onClick={handleFilter} disabled={!selectedColumn || !filterValue || !selectedTable}>
         Fetch by Filter
       </button>
 
-      {/* Input field to enter record ID */}
-      <h3>Enter Record ID</h3>
-      <input
-        type="number"
-        value={recordId}
-        onChange={handleRecordIdChange}
-        placeholder="Enter ID"
-        disabled={!selectedTable}
-      />
-
-      {/* ID button */}
-      <button onClick={handleFetchById} disabled={!recordId || !selectedTable}>
-        Fetch by ID
-      </button>
 
       {/* Display data as json */}
       {recordData && (
