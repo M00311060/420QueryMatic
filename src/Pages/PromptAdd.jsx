@@ -88,26 +88,35 @@ const PromptAdd = () => {
   // Handle form submission to add a new record
   const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     if (!selectedTable) {
       alert('Please select a table.');
       return;
     }
-
+  
     // Send the POST request to add the new record
     axios.post(`http://localhost:3001/api/${selectedTable}`, formData)
       .then((response) => {
         alert(`Record added successfully! ID: ${response.data.id}`);
         setRecordId(response.data.id);
-        // Optionally, navigate to another page or reset the form
-        navigate('/somePage');  // Adjust the path based on your needs
+  
+        // Navigate to Results page and pass the form data or the newly added record details
+        navigate('/results', {
+          state: {
+            selectedEntity: selectedTable,
+            selectedTeamId: response.data.id, // Pass the new record ID
+            sqlQuery: `INSERT INTO ${selectedTable} (${Object.keys(formData).join(', ')}) VALUES (${Object.values(formData).map(val => `'${val}'`).join(', ')})`,
+            deletedItem: null,
+            FilterData: [response.data]  // Pass the newly created record as FilterData
+          }
+        });
       })
       .catch((error) => {
         console.error('Error adding record:', error);
         alert('Failed to add record.');
       });
   };
-
+  
   return (
     <div className="prompt-add-page">
       <HeaderPromptBuilderPage />

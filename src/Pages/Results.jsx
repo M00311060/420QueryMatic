@@ -23,6 +23,19 @@ const Results = () => {
     }
   }, [FilterData]);
 
+   // Fetch team data if selectedTeamId is available
+   useEffect(() => {
+    if (selectedId) {
+      axios.get(`http://localhost:3001/api/teams/${selectedId}`) // Adjust this API endpoint as per your back-end
+        .then((response) => {
+          setTeamData(response.data); // Set the fetched team data
+        })
+        .catch((error) => {
+          console.error('Error fetching team data:', error);
+        });
+    }
+  }, [selectedId]);
+
   return (
     <div>
       <HeaderResultsPage />
