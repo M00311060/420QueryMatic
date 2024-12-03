@@ -12,9 +12,7 @@ const PromptAdd = () => {
   const [selectedTable, setSelectedTable] = useState('');
   const [columns, setColumns] = useState([]);
   const [selectedColumn, setSelectedColumn] = useState('');
-  const [filterValue, setFilterValue] = useState('');
   const [recordId, setRecordId] = useState('');
-  const [recordData, setRecordData] = useState(null);
   const [formData, setFormData] = useState({}); // For storing form input data
   const navigate = useNavigate();
 
