@@ -6,109 +6,211 @@ import HeaderPromptBuilderPage from '../Components/Headers/HeaderPromptBuilderPa
 import './PagesStyle/PromptBuilder.css';
 
 const PromptSelect = () => {
-  const [teams, setTeams] = useState([]);
-  const [selectedTeamId, setSelectedTeamId] = useState(null);
-  const [selectedTeamName, setSelectedTeamName] = useState(null);
-  const [sqlQuery, setSqlQuery] = useState('');
-  const [leagues, setLeagues] = useState(['AFC', 'NFC']);
-  const [selectedLeague, setSelectedLeague] = useState('');
-  const [championships, setChampionships] = useState(['0', '1', '2', '3', '4', '5','6','7','8','9','10']);
-  const [selectedChampionships, setSelectedChampionships] = useState('');
+  // State variables to store databases, tables, columns, and user inputs
+  const [databases, setDatabases] = useState([]);
+  const [selectedDatabase, setSelectedDatabase] = useState('');
+  const [tables, setTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState('');
+  const [columns, setColumns] = useState([]);
+  const [selectedColumn, setSelectedColumn] = useState('');
+  const [columnValues, setColumnValues] = useState([]);
+  const [filterValue, setFilterValue] = useState('');
+  const [recordId, setRecordId] = useState('');
+  const [recordData, setRecordData] = useState(null);
   const navigate = useNavigate();
 
+  // Fetch the list of available databases
   useEffect(() => {
-    axios.get('http://localhost:3001/api/nfl-teams')
+    axios.get('http://localhost:3001/api/databases')
       .then((response) => {
-        setTeams(response.data.data);
+        setDatabases(response.data.databases);
       })
       .catch((error) => {
-        console.error('Error fetching NFL teams:', error);
+        console.error('Error fetching databases:', error);
       });
   }, []);
 
-  const handleSelectTeam = (e) => {
-    const selectedTeamId = e.target.value;
-    const selectedTeam = teams.find((team) => team.id === parseInt(selectedTeamId));
+  // Handle database selection and fetch associated tables
+  const handleDatabaseChange = (e) => {
+    const selectedDb = e.target.value;
+    setSelectedDatabase(selectedDb);
 
-    setSelectedTeamId(selectedTeamId);
-    setSelectedTeamName(selectedTeam?.name || null);
-    setSqlQuery(`SELECT * FROM nfl_teams WHERE id = ${selectedTeamId}`);
+    // Post selected database and fetch tables
+    axios.post('http://localhost:3001/api/select-database', { database: selectedDb })
+      .then(() => {
+        axios.get('http://localhost:3001/api/tables')
+          .then((response) => {
+            if (response.data.tables) {
+              setTables(response.data.tables);
+            }
+          })
+          .catch((error) => {
+            console.error('Error fetching tables:', error);
+            setTables([]);  // Clear the tables list if an error occurs
+          });
+      })
+      .catch((error) => {
+        console.error('Error selecting database:', error);
+        setTables([]);  // Clear tables if the database selection fails
+      });
   };
 
-  const handleProceed = () => {
-    if (selectedTeamId && selectedTeamName) {
-      navigate('/results', { state: { selectedTeamId, selectedTeamName, sqlQuery } });
+  // Handle table selection and fetch associated columns
+  const handleTableChange = (e) => {
+    const selectedTable = e.target.value;
+    setSelectedTable(selectedTable);
+
+    // Fetch columns of the selected table
+    axios.get(`http://localhost:3001/api/${selectedTable}/columns`)
+      .then((response) => {
+        setColumns(response.data.columns);
+      })
+      .catch((error) => {
+        console.error('Error fetching columns:', error);
+      });
+  };
+
+  // Updates the state with the selected column when a column is chosen from the dropdown
+  const handleColumnChange = (e) => {
+    const selectedCol = e.target.value;
+    setSelectedColumn(selectedCol);
+    setColumnValues([]);
+
+    if (selectedCol) {
+      // Fetch distinct values for the selected column
+      axios.get(`http://localhost:3001/api/${selectedTable}/distinct-values`, {
+        params: { column: selectedCol },
+      })
+        .then((response) => setColumnValues(response.data.values || []))
+        .catch((error) => console.error('Error fetching distinct column values:', error));
     }
   };
 
-  const handleShowAllTeams = () => {
-    const allTeamsQuery = 'SELECT * FROM nfl_teams';
-    navigate('/results', { state: { FilterTeamsData: teams, selectedLeague: 'All Leagues', sqlQuery: allTeamsQuery } });
+  // Updates the state with the filter value when the user types in the filter input field
+  const handleFilterChange = (e) => {
+    setFilterValue(e.target.value);
   };
 
-  const handleShowLeagueTeams = () => {
-    axios.get(`http://localhost:3001/api/nfl-teams/league/${selectedLeague}`)
-      .then((response) => {
-        const leagueQuery = `SELECT * FROM nfl_teams WHERE league = '${selectedLeague}'`;
-        navigate('/results', { state: { FilterTeamsData: response.data.data, selectedLeague, sqlQuery: leagueQuery } });
-      })
-      .catch((error) => {
-        console.error('Error fetching teams by league:', error);
-      });
+  // Updates the state with the record ID when the user types in the record ID input field
+  const handleRecordIdChange = (e) => {
+    setRecordId(e.target.value);
   };
 
-  const handleShowChampionshipTeams = () => {
-    axios.get(`http://localhost:3001/api/nfl-teams/championships/${selectedChampionships}`)
+  const handleFilter = () => {
+    if (selectedColumn && filterValue && selectedTable) {
+      // Perform the column-based filtering
+      axios.get(`http://localhost:3001/api/${selectedTable}/filter`, {
+        params: {
+          column: selectedColumn,
+          value: filterValue
+        }
+      })
       .then((response) => {
-        const championshipQuery = `SELECT * FROM nfl_teams WHERE championships = ${selectedChampionships}`;
-        navigate('/results', { state: { FilterTeamsData: response.data.data, selectedChampionships, sqlQuery: championshipQuery } });
+        setRecordData(response.data.data);
+
+        // Navigate to Results page with the state
+        navigate('/results', {
+          state: {
+            selectedEntity: selectedDatabase,
+            selectedTeamId: '',  
+            sqlQuery: `SELECT * FROM ${selectedTable} WHERE ${selectedColumn} = ${filterValue}`,
+            FilterData: response.data.data || [],
+            deletedTeamName: ''
+          }
+        });
       })
       .catch((error) => {
-        console.error('Error fetching teams by championships:', error);
+        console.error('Error fetching filtered record:', error);
       });
+    }
+  };
+
+  // Fetch all records from the selected table
+  const handleFetchAllRecords = () => {
+    if (selectedTable) {
+      axios.get(`http://localhost:3001/api/${selectedTable}`)
+        .then((response) => {
+          // Navigate to Results page with all records
+          navigate('/results', {
+            state: {
+              selectedEntity: selectedDatabase,
+              sqlQuery: `SELECT * FROM ${selectedTable}`,
+              FilterData: response.data.data || []
+            }
+          });
+        })
+        .catch((error) => {
+          console.error('Error fetching all records:', error);
+        });
+    } else {
+      alert('Please select a table first.');
+    }
   };
 
   return (
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
-      <br />
-
-      <div className ="title">
-            <h1>Select From Database</h1>
+  
+      <div className="form-container">
+        <h1>Select From Database</h1>
+  
+        {/* Dropdown for selecting DB */}
+        <h3>Select Database</h3>
+        <select onChange={handleDatabaseChange} value={selectedDatabase}>
+          <option value="">--Select Database--</option>
+          {databases.map((db) => (
+            <option key={db} value={db}>{db}</option>
+          ))}
+        </select>
+  
+        {/* Dropdown for selecting table */}
+        <h3>Select Table</h3>
+        <select onChange={handleTableChange} value={selectedTable} disabled={!selectedDatabase}>
+          <option value="">--Select Table--</option>
+          {tables.map((table) => (
+            <option key={table} value={table}>{table}</option>
+          ))}
+        </select>
+  
+        {/* Dropdown for selecting column */}
+        <h3>Select Column</h3>
+        <select onChange={handleColumnChange} value={selectedColumn} disabled={!columns.length}>
+          <option value="">--Select Column--</option>
+          {columns.map((column) => (
+            <option key={column} value={column}>{column}</option>
+          ))}
+        </select>
+  
+        {/* Dropdown for filtering */}
+        <h3>Select Filter Value</h3>
+        <select onChange={handleFilterChange} value={filterValue} disabled={!columnValues.length}>
+          <option value="">--Select Value--</option>
+          {columnValues.map((value, index) => (
+            <option key={index} value={value}>{value}</option>
+          ))}
+        </select>
+  
+        <button onClick={handleFilter} disabled={!selectedColumn || !filterValue || !selectedTable}>
+          Fetch by Filter
+        </button>
+  
+        {/* Button to fetch all records */}
+        <button onClick={handleFetchAllRecords} disabled={!selectedTable}>
+          Fetch All Records
+        </button>
+  
+        {/* Display data as JSON */}
+        {recordData && (
+          <div className="record-data">
+            <h3>Record Details</h3>
+            <pre>{JSON.stringify(recordData, null, 2)}</pre>
+          </div>
+        )}
       </div>
-      <br />
-
-      <h3>Select an ID</h3>
-      <select onChange={handleSelectTeam} value={selectedTeamId}>
-        <option value="">--Select ID--</option>
-        {teams.map((team) => (
-          <option key={team.id} value={team.id}>
-            {team.id}
-          </option>
-        ))}
-      </select>
-      <button onClick={handleProceed} disabled={!selectedTeamId}>Proceed to Results</button>
-      
-      <h3>Filter</h3>
-      <select onChange={(e) => setSelectedLeague(e.target.value)} value={selectedLeague}>
-        <option value="">--Select league--</option>
-        {leagues.map((league) => (
-          <option key={league} value={league}>{league}</option>
-        ))}
-      </select>
-      <button onClick={handleShowLeagueTeams} disabled={!selectedLeague}>Filter</button>
-      <select onChange={(e) => setSelectedChampionships(e.target.value)} value={selectedChampionships}>
-        <option value="">--Select Championships--</option>
-        {championships.map((count) => (
-          <option key={count} value={count}>{count}</option>
-        ))}
-      </select>
-      <button onClick={handleShowChampionshipTeams} disabled={!selectedChampionships}>Filter</button>
-      <button onClick={handleShowAllTeams}>Show All</button>
-
+  
       <FooterPromptBuilderPage className="footer" />
     </div>
-  );
+  );  
 };
 
 export default PromptSelect;

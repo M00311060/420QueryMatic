@@ -5,3 +5,88 @@
     background-repeat: no-repeat; 
     background-position: center; 
   }
+
+  /* Style for the table */
+.table-styled {
+  width: 100%; /* Full width of the container */
+  border-collapse: separate; /* Allow spacing between cells */
+  border-spacing: 10px; /* Add space between columns */
+  margin: 20px 0; /* Add space above and below the table */
+  font-size: 16px; /* Set a readable font size */
+  text-align: left; /* Align text to the left */
+}
+
+/* Add padding and borders for clear separation */
+.table-styled th, .table-styled td {
+  padding: 10px 15px; /* Adjust padding for more spacing */
+  border: 1px solid #ddd; /* Add a light border around each cell */
+  background-color: #fff; /* Ensure cells have a background color */
+}
+
+/* Header styling for visibility */
+.table-styled th {
+  background-color: #f4f4f4; /* Light gray background for headers */
+  font-weight: bold; /* Bold text for headers */
+  text-align: center; /* Center align header text */
+}
+
+/* Optional: Add zebra striping for readability */
+.table-styled tbody tr:nth-child(even) {
+  background-color: #f9f9f9; /* Light gray background for alternate rows */
+}
+
+/* Highlight row on hover */
+.table-styled tbody tr:hover {
+  background-color: #f1f1f1; /* Light highlight on hover */
+}
+
+.results-header {
+  color: #4B0082; 
+}
+
+.filtered-data-header {
+  color: #4B0082; 
+}
+
+/* Container and style for the deleted item message */
+.deleted-item-container {
+  background-color: #f4f4f9; /* Light background for emphasis */
+  border: 2px solid #4B0082; /* Dark purple border */
+  padding: 10px;
+  margin: 20px 0;
+  border-radius: 5px;
+}
+
+.deleted-item-message {
+  color: #4B0082; /* Dark purple */
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Container and style for the "No data found" message */
+.no-data-container {
+  background-color: #fff5f5; /* Light red background for emphasis */
+  border: 2px solid #FF4500; /* Orange-red border */
+  padding: 10px;
+  margin: 20px 0;
+  border-radius: 5px;
+}
+
+.no-data-message {
+  color: #FF4500; /* Orange-red */
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.sql-command-header {
+  color: #4B0082; 
+}
+
+.sql-command {
+  color: #FFFFFF; 
+  background-color: #4B0082; /* Indigo, slightly darker than purple */
+  padding: 5px;
+  border-radius: 4px;
+}

@@ -1,87 +1,65 @@
-//Imports 
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
 import FooterResultsPage from '../Components/Footers/FooterResultsPage';
 import HeaderResultsPage from '../Components/Headers/HeaderResultsPage';
 import './PagesStyle/ResultsStyle.css';
 
 const Results = () => {
   const location = useLocation();
-  const [teamData, setTeamData] = useState(null);
-  
-  // Extract data from location state
-  const selectedTeamId = location.state?.selectedTeamId;
-  const sqlQuery = location.state?.sqlQuery;
-  const deletedTeamName = location.state?.deletedTeamName;
-  const FilterTeamsData = location.state?.FilterTeamsData;
+  const [filterData, setFilterData] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const sqlQuery = location.state?.sqlQuery || 'No query provided';
+  const deletedItem = location.state?.deletedItem;
 
   useEffect(() => {
-    if (selectedTeamId) {
-      axios.get(`http://localhost:3001/api/nfl-teams/${selectedTeamId}`)
-        .then((response) => setTeamData(response.data.data))
-        .catch((error) => console.error('Error fetching team details:', error));
+    console.log("Location state:", location.state);
+
+    // Set data and columns
+    const data = location.state?.FilterData || [];
+    setFilterData(data);
+    if (data.length > 0) {
+      setColumns(Object.keys(data[0]));
     }
-  }, [selectedTeamId]);
+  }, [location.state]);
 
   return (
-    <div className ="container">
+    <div class="container">
       <HeaderResultsPage />
-      <br />
-      <h1>Results Page</h1>
-      <br />
-      <h3>Your Query Results:</h3>
-      <hr />
-      
-      {deletedTeamName ? (
-        <p>Data "{deletedTeamName}" has been deleted successfully.</p>
-      ) : teamData ? (
+      <h3 className="results-header">Results</h3>
+      {deletedItem ? (
+        <div className="deleted-item-container">
+        <p className="deleted-item-message">
+          Record "{deletedItem}" has been deleted successfully.
+        </p>
+      </div>
+      ): filterData.length > 0 ? (
         <div>
-          <p><strong>Team Name:</strong> {teamData.name}</p>
-          <p><strong>Location:</strong> {teamData.location}</p>
-          <p><strong>League:</strong> {teamData.league}</p>
-          <p><strong>Abbreviation:</strong> {teamData.abbreviation}</p>
-          <p><strong>Championships:</strong> {teamData.championships}</p>
-          <p><strong>SQL Query:</strong> <code>{sqlQuery}</code></p>
-        </div>
-      ) : FilterTeamsData ? (
-        <div>
-            <h4>Filtered Data:</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Location</th>
-                        <th>League</th>
-                        <th>Abbreviation</th>
-                        <th>Championships</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {FilterTeamsData.length > 0 ? (
-                        FilterTeamsData.map((team) => (
-                            <tr key={team.id}>
-                                <td>{team.id}</td>
-                                <td>{team.name}</td>
-                                <td>{team.location}</td>
-                                <td>{team.league}</td>
-                                <td>{team.abbreviation}</td>
-                                <td>{team.championships}</td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="6">No teams found.</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-          <h4>SQL Command:</h4>
-          <code>{sqlQuery}</code>
+          <h4 className="filtered-data-header">Filtered Data:</h4>
+          <table className="table-styled">
+            <thead>
+              <tr>
+                {columns.map((col) => (
+                  <th key={col}>{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filterData.map((record, index) => (
+                <tr key={index}>
+                  {columns.map((col) => (
+                    <td key={col}>{record[col]}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <h4 className="sql-command-header">SQL Command:</h4>
+          <code className="sql-command">{sqlQuery}</code>
         </div>
       ) : (
-        <p>No data selected or unable to fetch details.</p>
+        <div className="no-data-container">
+        <p className="no-data-message">No data found or unable to fetch details.</p>
+      </div>
       )}
 
       <FooterResultsPage />

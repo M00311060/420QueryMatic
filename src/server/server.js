@@ -2,42 +2,117 @@ import express from 'express';
 import sqlite3 from 'sqlite3';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import fs from 'fs';
+import path from 'path';
 
+// Function to list available `.db` files in the current directory
+const listDatabases = () => {
+    return fs.readdirSync('./').filter(file => path.extname(file) === '.db');
+};
+
+// Initialize express app
 const app = express();
-const db = new sqlite3.Database('./nflteams.db');
+let db = null; // Database connection variable
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// CREATE: Add a new NFL team
-app.post('/api/nfl-teams', (req, res) => {
-    console.log('Request Body:', req.body); // Log the request body
-    const { name, location, league, abbreviation, championships } = req.body;
-    db.run(
-        `INSERT INTO nfl_teams (name, location, league, abbreviation, championships) VALUES (?, ?, ?, ?, ?)`,
-        [name, location, league, abbreviation, championships],
-        function (err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            // Include all the new team's details in the response
-            res.status(201).json({ 
-                id: this.lastID, 
-                name, 
-                location, 
-                league, 
-                abbreviation, 
-                championships 
-            });
-        }
-    );
+// List available databases endpoint
+app.get('/api/databases', (req, res) => {
+    const dbFiles = listDatabases();
+    res.json({ databases: dbFiles });
 });
 
-// READ: Get all NFL teams
-app.get('/api/nfl-teams', (req, res) => {
-    db.all(`SELECT * FROM nfl_teams`, [], (err, rows) => {
+// Select a database to use (by file name)
+app.post('/api/select-database', (req, res) => {
+    const { database } = req.body;
+    const dbFilePath = path.join('./', database);
+
+    // Check if the selected file exists
+    if (!fs.existsSync(dbFilePath)) {
+        return res.status(404).json({ error: `Database file not found: ${database}` });
+    }
+
+    // Close the existing connection if any
+    if (db) {
+        db.close((err) => {
+            if (err) {
+                console.error('Error closing the previous database connection:', err);
+            }
+        });
+    }
+
+    // Open the new database
+    db = new sqlite3.Database(dbFilePath, (err) => {
+        if (err) {
+            return res.status(500).json({ error: `Failed to connect to database: ${err.message}` });
+        }
+        console.log(`Connected to the database: ${dbFilePath}`);
+        res.json({ message: `Database set to ${database}` });
+    });
+});
+
+// Ensure a database is selected before performing actions
+const ensureDbSelected = (req, res, next) => {
+    if (!db) {
+        return res.status(400).json({ error: 'No database selected. Please select a database first.' });
+    }
+    next();
+};
+
+// Endpoint: to fetch all tables in the selected database
+app.get('/api/tables', ensureDbSelected, (req, res) => {
+    db.all("SELECT name FROM sqlite_master WHERE type='table'", (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ tables: rows.map(row => row.name) });
+    });
+});
+
+// Endpoint: to fetch columns of a table
+app.get('/api/:table/columns', ensureDbSelected, (req, res) => {
+    const { table } = req.params;
+
+    db.all(`PRAGMA table_info(${table})`, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        // Extract column names from the result
+        const columns = rows.map(row => row.name);
+        res.json({ columns });
+    });
+});
+
+// Endpoint: to fetch distinct values from a specified column in a table
+app.get('/api/:table/distinct-values', (req, res) => {
+    const { table } = req.params;
+    const { column } = req.query;
+  
+    const query = `SELECT DISTINCT ${column} FROM ${table}`;
+    db.all(query, [], (err, rows) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send({ error: 'Failed to fetch distinct values' });
+      } else {
+        res.send({ values: rows.map((row) => row[column]) });
+      }
+    });
+  });  
+
+app.get('/api/:table/filter', ensureDbSelected, (req, res) => {
+    const { table } = req.params;
+    const { column, value } = req.query;
+
+    if (!column || !value) {
+        return res.status(400).json({ error: 'Column and value are required for filtering' });
+    }
+
+    const query = `SELECT * FROM ${table} WHERE ${column} = ?`;
+
+    db.all(query, [value], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -46,70 +121,110 @@ app.get('/api/nfl-teams', (req, res) => {
     });
 });
 
-// READ: Get a single NFL team by ID
-app.get('/api/nfl-teams/:id', (req, res) => {
-    const { id } = req.params;
-    db.get(`SELECT * FROM nfl_teams WHERE id = ?`, [id], (err, row) => {
+// Endpoint to fetch table IDs from the selected database
+app.get('/api/:table/ids', ensureDbSelected, (req, res) => {
+    const { table } = req.params;
+
+    // Check if table exists
+    db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name=?`, [table], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: `Table '${table}' does not exist.` });
+        }
+
+        // Fetch the IDs from the selected table
+        db.all(`SELECT id FROM ${table}`, (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            // Send the IDs as an array of objects
+            res.json({ ids: rows.map(row => row.id) });
+        });
+    });
+});
+
+// CREATE: Add a new record to any table
+app.post('/api/:table', ensureDbSelected, (req, res) => {
+    const { table } = req.params;
+    const data = req.body;
+
+    const columns = Object.keys(data).join(', ');
+    const placeholders = Object.keys(data).map(() => '?').join(', ');  // Use placeholders for values
+    const values = Object.values(data);
+
+    const query = `INSERT INTO ${table} (${columns}) VALUES (${placeholders})`;
+
+    db.run(query, values, function (err) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.status(201).json({ id: this.lastID, ...data });
+    });
+});
+
+// READ: Get all records from any table
+app.get('/api/:table', ensureDbSelected, (req, res) => {
+    const { table } = req.params;
+
+    db.all(`SELECT * FROM ${table}`, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ data: rows });
+    });
+});
+
+// READ: Get a single record by ID from any table
+app.get('/api/:table/:id', ensureDbSelected, (req, res) => {
+    const { table, id } = req.params;
+
+    db.get(`SELECT * FROM ${table} WHERE id = ?`, [id], (err, row) => {
         if (err) {
             res.status(500).json({ error: err.message });
         } else if (!row) {
-            res.status(404).json({ error: 'Team not found' });
+            res.status(404).json({ error: `${table} not found` });
         } else {
             res.json({ data: row });
         }
     });
 });
 
-// READ: Get teams by league
-app.get('/api/nfl-teams/league/:league', (req, res) => {
-    const league = req.params.league;
-    db.all(`SELECT * FROM nfl_teams WHERE league = ?`, [league], (err, rows) => {
+// UPDATE: Update a record by ID in any table
+app.put('/api/:table/:id', ensureDbSelected, (req, res) => {
+    const { table, id } = req.params;
+    const data = req.body;
+
+    const updates = Object.keys(data).map(key => `${key} = ?`).join(', ');
+    const values = Object.values(data);
+
+    const query = `UPDATE ${table} SET ${updates} WHERE id = ?`;
+
+    db.run(query, [...values, id], function (err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json({ data: rows });
+        res.json({ updatedRows: this.changes });
     });
 });
 
-// READ: Get teams by championships
-app.get('/api/nfl-teams/championships/:championships', (req, res) => {
-    const championships = req.params.championships;
-    db.all(`SELECT * FROM nfl_teams WHERE championships = ?`, [championships], (err, rows) => {
+// DELETE: Delete a record by ID from any table
+app.delete('/api/:table/delete/:id', ensureDbSelected, (req, res) => {
+    const { table, id } = req.params;
+
+    const query = `DELETE FROM ${table} WHERE id = ?`;
+
+    db.run(query, [id], function (err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json({ data: rows });
-    });
-});
-
-// UPDATE: Update an NFL team by ID
-app.put('/api/nfl-teams/:id', (req, res) => {
-    const { id } = req.params;
-    const { name, location, league, abbreviation, championships } = req.body;
-    db.run(
-        `UPDATE nfl_teams SET name = ?, location = ?, league = ?, abbreviation = ?, championships = ? WHERE id = ?`,
-        [name, location, league, abbreviation, championships, id],
-        function (err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            res.json({ updatedRows: this.changes });
-        }
-    );
-});
-
-// DELETE: Delete an NFL team by ID
-app.delete('/api/nfl-teams/:id', (req, res) => {
-    const { id } = req.params;
-    db.run(`DELETE FROM nfl_teams WHERE id = ?`, [id], function (err) {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ deletedRows: this.changes });
+        // Returning the ID of the deleted record for confirmation
+        res.json({ deletedRows: this.changes, deletedRecordId: id });
     });
 });
 
@@ -118,4 +233,3 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-

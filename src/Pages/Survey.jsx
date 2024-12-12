@@ -36,7 +36,7 @@ const Survey = () => {
 
         <br />
 
-          <div className ="title">
+          <div className ="form-container">
             <h1>Survey Page</h1>
           </div>
         
