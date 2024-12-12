@@ -1,0 +1,23 @@
+.login-header {
+    background-color: #fff;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.login-header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.login-header-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #fff;
+    margin: 0;
+    text-shadow: 0 2px 5px rgba(35, 2, 74, 0.9);
+}
