@@ -7,6 +7,14 @@
 
 .help-content {
   margin: 40px 0;
+
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3));
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.help-content h1 {
+  text-shadow: 2px 2px 4px rgba(255, 255, 255);
 }
 
 .help-section {
@@ -14,15 +22,17 @@
 }
 
 .help-section h2 {
-  color: #333;
+  color: white;
   font-size: 24px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .help-section p,
 .help-section ul,
 .help-section dl {
   font-size: 18px;
-  color: #555;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .help-section ul {
@@ -52,4 +62,3 @@ footer {
   padding: 10px;
   background-color: #f0f0f0;
 }
-

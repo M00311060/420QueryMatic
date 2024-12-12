@@ -34,6 +34,9 @@ const Help = () => {
         <section className="help-section">
           <h2>Key Terms</h2>
           <dl>
+            <dt>Query</dt>
+            <dd>A request to access or manipulate data in a database (e.g., retrieving specific rows or updating a table).</dd>
+
             <dt>SQL</dt>
             <dd>Structured Query Language, a programming language used to manage data in a relational database.</dd>
 
@@ -48,9 +51,6 @@ const Help = () => {
 
             <dt>Condition</dt>
             <dd>Criteria used to filter data (e.g., showing only rows where the price is greater than $100).</dd>
-
-            <dt>Query</dt>
-            <dd>A request to access or manipulate data in a database (e.g., retrieving specific rows or updating a table).</dd>
 
             <dt>Database</dt>
             <dd>An organized collection of data that can be accessed and managed programmatically.</dd>
