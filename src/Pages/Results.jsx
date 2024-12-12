@@ -25,13 +25,15 @@ const Results = () => {
   }, [selectedTeamId]);
 
   return (
-    <div className ="container">
+    <div className ="container-results">
       <HeaderResultsPage />
       <br />
       <h1>Results Page</h1>
       <br />
       <h3>Your Query Results:</h3>
       <hr />
+
+      <div className ="results-box">
       
       {deletedTeamName ? (
         <p>Data "{deletedTeamName}" has been deleted successfully.</p>
@@ -83,6 +85,8 @@ const Results = () => {
       ) : (
         <p>No data selected or unable to fetch details.</p>
       )}
+
+      </div>
 
       <FooterResultsPage />
     </div>

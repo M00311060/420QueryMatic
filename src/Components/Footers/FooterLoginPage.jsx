@@ -1,4 +1,6 @@
 import React from 'react';
+import './FooterStyles/LoginFooterStyle.css';
+
 const FooterLoginPage = () => {
     return (
         <footer>
