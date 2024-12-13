@@ -41,11 +41,13 @@
 }
 
 .results-header {
-  color: #4B0082; 
+  color: #4f296b; 
+  font-size: 48px;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255);
 }
 
 .filtered-data-header {
-  color: #4B0082; 
+  color: #4f296b; 
 }
 
 /* Container and style for the deleted item message */
@@ -58,7 +60,7 @@
 }
 
 .deleted-item-message {
-  color: #4B0082; /* Dark purple */
+  color: #4f296b; /* Dark purple */
   font-size: 16px;
   font-weight: bold;
   text-align: center;
@@ -74,19 +76,19 @@
 }
 
 .no-data-message {
-  color: #4B0082; 
+  color: #4f296b; 
   font-size: 16px;
   font-weight: bold;
   text-align: center;
 }
 
 .sql-command-header {
-  color: #4B0082; 
+  color: #4f296b; 
 }
 
 .sql-command {
   color: #FFFFFF; 
-  background-color: #4B0082; /* Indigo, slightly darker than purple */
+  background-color: #4f296b; /* Indigo, slightly darker than purple */
   padding: 5px;
   border-radius: 4px;
 }
