@@ -150,7 +150,8 @@ const PromptSelect = () => {
   return (
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
-  
+
+      <br />
       <div className="form-container">
         <h1>Select From Database</h1>
   

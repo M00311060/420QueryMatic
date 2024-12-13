@@ -112,6 +112,8 @@ const PromptDelete = () => {
   return (
     <div className="container">
       <HeaderPromptBuilderPage />
+
+      <br />
       <div className="form-container">
         <h1>Delete Record</h1>
 

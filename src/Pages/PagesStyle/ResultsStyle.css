@@ -67,14 +67,14 @@
 /* Container and style for the "No data found" message */
 .no-data-container {
   background-color: #fff5f5; /* Light red background for emphasis */
-  border: 2px solid #FF4500; /* Orange-red border */
+  border: 2px solid #4B0082; 
   padding: 10px;
   margin: 20px 0;
   border-radius: 5px;
 }
 
 .no-data-message {
-  color: #FF4500; /* Orange-red */
+  color: #4B0082; 
   font-size: 16px;
   font-weight: bold;
   text-align: center;

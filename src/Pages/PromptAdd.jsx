@@ -119,7 +119,10 @@ const PromptAdd = () => {
     <div className="container">
       <HeaderPromptBuilderPage />
       
+      <br />
       <div className="form-container">
+        <h1>Add To Database</h1>
+
         <form onSubmit={handleSubmit}>
           <label htmlFor="database">Select Database:</label>
           <select id="database" value={selectedDatabase} onChange={handleDatabaseChange}>

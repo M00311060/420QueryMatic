@@ -156,6 +156,7 @@ const UpdateRecordPage = () => {
     <div className="container">
       <HeaderPromptBuilderPage className="header" />
   
+      <br />
       <div className="form-container">
         <h1>Update Record</h1>
   
